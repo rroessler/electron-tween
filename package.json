@@ -4,7 +4,7 @@
   "description": "A tweening library for ElectronJS BrowserWindows.",
   "main": "electron-tween.js",
   "scripts": {
-    "start": "electron ./demo/index.js"
+    "start": "electron ./electron-tween-demo/index.js"
   },
   "keywords": [
     "electron",

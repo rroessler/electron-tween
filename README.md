@@ -145,19 +145,19 @@ There are multiple easing types available. These have been sourced from [easings
 
 Alongside this, qualifiers of IN, OUT and IN_OUT are to be used to generate the full range of easing types:
 
-Curve | IN | OUT | IN_OUT 
------ | -- | --- | ------
-LINEAR | x | x | x
-QUAD | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
-CUBIC | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
-QUART | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
-QUINT | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
-EXPO | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
-SINE | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
-CIRC | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
-BACK | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
-ELASTIC | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
-BOUNCE | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
+Curve | nil | IN | OUT | IN_OUT 
+----- | --- | -- | --- | ------
+LINEAR | &#9745; | &#9746; | &#9746; | &#9746;
+QUAD | &#9746; | &#9745; | &#9745; | &#9745;
+CUBIC | &#9746; | &#9745; | &#9745; | &#9745;
+QUART | &#9746; | &#9745; | &#9745; | &#9745;
+QUINT | &#9746; | &#9745; | &#9745; | &#9745;
+EXPO | &#9746; | &#9745; | &#9745; | &#9745;
+SINE | &#9746; | &#9745; | &#9745; | &#9745;
+CIRC | &#9746; | &#9745; | &#9745; | &#9745;
+BACK | &#9746; | &#9745; | &#9745; | &#9745;
+ELASTIC | &#9746; | &#9745; | &#9745; | &#9745;
+BOUNCE | &#9746; | &#9745; | &#9745; | &#9745;
 
 These should be reference as:
 
@@ -169,11 +169,50 @@ easing = "LINEAR"; // the only exception
 
 ```
 
-## Typical Usage
-
 
 ## Promise Example
 
+Tween's can also be promise chained by utilising the onComplete() input property. This allows for an ease of chaining tween's after each other. In future, this will be
+expanded on to allow for tween chaining regardless of utilizing built-in promises (however doing so does open up more versatility in terms of asynchronicity).
+
+```javascript
+
+const { ElectronTWEEN } = require('electron-tween');
+let browserWin = BrowserWindow.getFocusedWindow();
+
+new Promise(resolve => {
+    ElectronTWEEN.FadeOut({
+        win: browserWin,
+        onComplete: () => {
+            resolve();
+        }
+    });
+}).then(() => {
+    return new Promise(resolve => {
+        ElectronTWEEN.FadeIn({
+            win: browserWin,
+            onComplete: () => {
+                resolve();
+            }
+        });
+    });
+}).then(() => {
+    // continue as desired
+}).catch(err => {
+    // error handling
+});
+
+```
+
+## Demo Example
+
+To try a demo example, run the following:
+
+```bash
+git clone https://github.com/rroessler/electron-tween # clone the project repo
+npm install # ensure all Electron dependencies are included (and spectre.css styling)
+npm start # and run electron
+```
 
 ## License
 
