@@ -1,0 +1,16 @@
+{
+  "name": "electron-tween",
+  "version": "1.0.0",
+  "description": "A tweening library for ElectronJS BrowserWindows.",
+  "main": "electron-tween.js",
+  "scripts": {
+    "start": "electron ./demo/index.js"
+  },
+  "keywords": [],
+  "author": "rroesslerIO@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "spectre.css": "^0.5.9",
+    "electron": "^11.2.1"
+  }
+}
