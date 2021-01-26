@@ -2,6 +2,8 @@
 
 "electron-tween" is a Node Library specifically created to add tween functionality to Electron BrowserWindows.
 
+Coming from a need at work to have more dynamic "native" window animations and nothing else being available, I decided to pull together my own tween library primarily for Electron.
+
 ## Installation
 
 To install "electron-tween", use npm. The preferred method is to install "electron-tween" as a dependency, alongside
