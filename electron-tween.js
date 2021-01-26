@@ -61,7 +61,8 @@ class ElectronTWEEN {
             win: null,
             time: 1000,
             easing: 'LINEAR',
-            start: true
+            start: true,
+            onComplete: () => { }
         };
         opts = { ...defs, ...opts };
 
