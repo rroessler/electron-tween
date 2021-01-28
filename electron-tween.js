@@ -1,3 +1,7 @@
+/**
+ * ElectronTWEEN class contains static methods to "tween" properties such as opacity, size
+ * and position of the Electron BrowserWindow.
+ */
 class ElectronTWEEN {
     /**
      * Fades a BrowserWindow as per the options given. Expects a BrowserWindow
@@ -24,6 +28,11 @@ class ElectronTWEEN {
             onComplete: () => { }
         };
         opts = { ...defs, ...opts };
+
+        // check that the time value given is valid
+        try {
+            ElectronTWEEN.IsValidTime(opts.time);
+        } catch (err) { throw err; }
 
         // check the window is valid and exists
         try {
@@ -66,6 +75,11 @@ class ElectronTWEEN {
         };
         opts = { ...defs, ...opts };
 
+        // check that the time value given is valid
+        try {
+            ElectronTWEEN.IsValidTime(opts.time);
+        } catch (err) { throw err; }
+
         // check the window is valid and exists
         try {
             ElectronTWEEN.IsValidWindow(opts.win);
@@ -101,6 +115,11 @@ class ElectronTWEEN {
         };
         opts = { ...defs, ...opts };
 
+        // check that the time value given is valid
+        try {
+            ElectronTWEEN.IsValidTime(opts.time);
+        } catch (err) { throw err; }
+
         // check the window is valid and exists
         try {
             ElectronTWEEN.IsValidWindow(opts.win);
@@ -116,9 +135,10 @@ class ElectronTWEEN {
     }
 
     /**
-     * Resizes a BrowserWindow using in-built DOM window variable.
+     * Resizes a BrowserWindow to a given size. Recommended
      * 
      * @param {Object} opts                         Options object.
+     * @param {Electron.BrowserWindow} opts.win     BrowserWindow to fade.
      * @param {Object} opts.from                    XY Object.
      * @param {Number} opts.from.x                  'x' item of XY object.
      * @param {Number} opts.from.y                  'y' item of XY object.
@@ -133,14 +153,29 @@ class ElectronTWEEN {
     static Resize(opts) {
         // assign default options
         const defs = {
-            from: { x: 1024, y: 768 },
-            to: { x: 640, y: 480 },
+            win: null,
+            from: null,
+            to: { x: 640, y: 600 },
             time: 1000,
             easing: 'LINEAR',
             start: true,
             onComplete: () => { }
         };
         opts = { ...defs, ...opts };
+
+        // update all nullish items that are allowed
+        opts.from = opts.from ?? { x: opts.win.getSize()[0], y: opts.win.getSize()[1] }; // if FROM is null set as window's current value
+
+        // check that the time value given is valid
+        try {
+            ElectronTWEEN.IsValidTime(opts.time);
+        } catch (err) { throw err; }
+
+        // check the window is valid and exists
+        try {
+            ElectronTWEEN.IsValidWindow(opts.win);
+        } catch (err) { throw err; }
+
 
         // make sure both the from and to are valid
         try {
@@ -152,7 +187,10 @@ class ElectronTWEEN {
             .To(opts.to, opts.time)
             .SetEasing(opts.easing)
             .OnUpdate((size) => {
-                window.resizeTo(size.x, size.y);
+                // ensure all values are integers and >= 0
+                size.x = Math.max(Math.round(size.x), 0);
+                size.y = Math.max(Math.round(size.y), 0);
+                opts.win.setSize(size.x, size.y);
             });
 
         if (opts.start) {
@@ -166,6 +204,7 @@ class ElectronTWEEN {
      * Moves a BrowserWindow using in-built DOM window variable.
      * 
      * @param {Object} opts                         Options object.
+     * @param {Electron.BrowserWindow} opts.win     BrowserWindow to fade.
      * @param {Object} opts.from                    XY Object.
      * @param {Number} opts.from.x                  'x' item of XY object.
      * @param {Number} opts.from.y                  'y' item of XY object.
@@ -180,7 +219,8 @@ class ElectronTWEEN {
     static Move(opts) {
         // assign default options
         const defs = {
-            from: { x: 0, y: 0 },
+            win: null,
+            from: null,
             to: { x: 250, y: 250 },
             time: 1000,
             easing: 'LINEAR',
@@ -188,6 +228,19 @@ class ElectronTWEEN {
             onComplete: () => { }
         };
         opts = { ...defs, ...opts };
+
+        // update all nullish items that are allowed
+        opts.from = opts.from ?? { x: opts.win.getBounds().x, y: opts.win.getBounds().y }; // if FROM is null set as window's current value
+
+        // check that the time value given is valid
+        try {
+            ElectronTWEEN.IsValidTime(opts.time);
+        } catch (err) { throw err; }
+
+        // check the window is valid and exists
+        try {
+            ElectronTWEEN.IsValidWindow(opts.win);
+        } catch (err) { throw err; }
 
         // make sure both the from and to are valid
         try {
@@ -198,8 +251,11 @@ class ElectronTWEEN {
         const tween = new SimpleTWEEN(opts.from)
             .To(opts.to, opts.time)
             .SetEasing(opts.easing)
-            .OnUpdate((size) => {
-                window.moveTo(size.x, size.y);
+            .OnUpdate((pos) => {
+                // ensure all positions are rounded to integers and >= 0
+                pos.x = Math.max(Math.round(pos.x), 0);
+                pos.y = Math.max(Math.round(pos.y), 0);
+                opts.win.setBounds({ x: pos.x, y: pos.y });
             });
 
         if (opts.start) {
@@ -246,6 +302,17 @@ class ElectronTWEEN {
             if (key !== 'x' && key !== 'y') {
                 throw new TypeError('Given To/From is of an invalid object type. Must be of a type {x: ..., y:, ...}.');
             }
+        }
+    }
+
+    /**
+     * Determines whether the time input given is a valid integer.
+     * 
+     * @param {Number} time     Presumed time integer value > 0.
+     */
+    static IsValidTime(time) {
+        if (time === NaN || time <= 0) {
+            throw new TypeError(`Invalid transition time. Must be an integer and greater than 0.`);
         }
     }
 };
@@ -391,7 +458,7 @@ class SimpleTWEEN {
             case 'QUART_IN_OUT':
                 // update the multplier to be quintic in/out
                 this.multiplier = x => {
-                    return x < 0.5 ? 8 * x ** 4 : 1 - pow(-2 * x + 2, 4) / 2;
+                    return x < 0.5 ? 8 * x ** 4 : 1 - Math.pow(-2 * x + 2, 4) / 2;
                 }
                 break;
             case 'QUINT_IN':
