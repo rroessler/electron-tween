@@ -21,8 +21,13 @@ function HandleButtonClick(btn) {
     btn.disabled = true;
     const win = BrowserWindow.getFocusedWindow();
 
-    // retrieve the easing type
+    // retrieve the easing type and transition time
     const easing = document.getElementById('easing').value + '_' + document.getElementById('easing-qualifier').value;
+    const time = parseInt(document.getElementById('transition-time').value);
+
+    if (time === NaN || time <= 0) {
+        console.warning('The transition time given is either invalid or <= 0. This will result in a runtime error.');
+    }
 
     // switch based on button chosen
     switch (btn.id.toUpperCase()) {
@@ -32,6 +37,7 @@ function HandleButtonClick(btn) {
                 ElectronTWEEN.FadeOut({
                     win,
                     easing,
+                    time,
                     onComplete: () => {
                         resolve();
                     }
@@ -40,6 +46,7 @@ function HandleButtonClick(btn) {
                 ElectronTWEEN.FadeIn({
                     win,
                     easing,
+                    time,
                     onComplete: () => {
                         btn.disabled = false;
                     }
@@ -53,9 +60,10 @@ function HandleButtonClick(btn) {
 
             new Promise(resolve => {
                 ElectronTWEEN.Move({
-                    from: { x: startX, y: startY },
+                    win,
                     to: { x: 0, y: 0 },
                     easing,
+                    time,
                     onComplete: () => {
                         resolve();
                     }
@@ -63,7 +71,9 @@ function HandleButtonClick(btn) {
             }).then(() => {
                 return new Promise(resolve => {
                     ElectronTWEEN.Move({
+                        win,
                         easing,
+                        time,
                         onComplete: () => {
                             resolve();
                         }
@@ -71,9 +81,11 @@ function HandleButtonClick(btn) {
                 });
             }).then(() => {
                 ElectronTWEEN.Move({
+                    win,
                     from: { x: 250, y: 250 },
                     to: { x: startX, y: startY },
                     easing,
+                    time,
                     onComplete: () => {
                         btn.disabled = false;
                     }
@@ -83,9 +95,10 @@ function HandleButtonClick(btn) {
         case 'EXPAND':
             // expects to be from the renderer process
             ElectronTWEEN.Resize({
-                from: { x: 640, y: 480 },
+                win,
                 to: { x: 1024, y: 768 },
                 easing,
+                time,
                 onComplete: () => {
                     document.getElementById('shrink').disabled = false;
                 }
@@ -94,7 +107,9 @@ function HandleButtonClick(btn) {
         case 'SHRINK':
             // expects to be from the renderer process
             ElectronTWEEN.Resize({
+                win,
                 easing,
+                time,
                 onComplete: () => {
                     document.getElementById('expand').disabled = false;
                 }
