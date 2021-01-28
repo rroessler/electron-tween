@@ -93,8 +93,8 @@ ElectronTWEEN.FadeOut({
 
 ### Resize
 
-Resize() utilises the BrowserWindow.setSize() method to change the BrowserWindows size. This was chosen as the native DOM window
-object can only resize a window to a set limit. This method can be used as:
+Resize() utilises the BrowserWindow.setBounds() method to change the BrowserWindows size. This was chosen as the native DOM window
+object can only resize a window to a set limit, and used over the setSize() method as if a BrowserWindow is NOT resizeable then only setBounds() will work. This method can be used as:
 
 ```javascript
 
