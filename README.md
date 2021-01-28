@@ -16,14 +16,15 @@ npm install --save electron-tween
 ## Usage
 
 As a TWEEN library, "electron-tween" has been written so that as little items from Electron are used. To do so, all functionality
-of "electron-tween" relies either upon the DOM window object, or if imperatively needed, a chosen BrowserWindow as input.
+of "electron-tween" relies upon being given a BrowserWindow object. Although this can be done through using Electrons remote module,
+it is recommended to make use of IPC events instead to access windows/this library from the main process.
 
 The current functionality includes:
 * [Fade](#fade): Fades a BrowserWindow from a given opacity to another.
 * [FadeIn](#fade_in): Fades a BrowserWindow IN to full opacity.
 * [FadeOut](#fade_out): Fades a BrowserWindow OUT to full transparency.
-* [Resize](#resize): Resizes a BrowserWindow (renderer only through DOM window object)
-* [Move](#move): Moves a BrowserWindow (renderer only through DOM window object)
+* [Resize](#resize): Resizes a BrowserWindow to given size.
+* [Move](#move): Moves a BrowserWindow to given position.
 
 ### Fade
 
@@ -92,15 +93,16 @@ ElectronTWEEN.FadeOut({
 
 ### Resize
 
-Resize() utilizes the DOM window object of a BrowserWindow, and as such must be called from the Renderer process. This is because the window.resizeTo() method is faster that repeatedly calling the BrowserWindow.setBounds() method. This method can be used as:
+Resize() utilises the BrowserWindow.setSize() method to change the BrowserWindows size. This was chosen as the native DOM window
+object can only resize a window to a set limit. This method can be used as:
 
 ```javascript
 
 const { ElectronTWEEN } = require('electron-tween');
 
 ElectronTWEEN.Resize({
-    from: { x: 1024, y: 768 },  // must provide an XY object such as this
-    to: { x: 640, y: 480 },     // and same here
+    from: { x: 1024, y: 768 },  // if not set uses current BrowserWindow size, otherwise JUMPS to this size
+    to: { x: 640, y: 480 },     // must provide an XY object such as this
     time: 1000,                 // transition time
     easing: 'LINEAR',           // type of easing
     start: true,                // automatically start
@@ -112,15 +114,15 @@ ElectronTWEEN.Resize({
 
 ### Move
 
-Move() utilizes the DOM window object of a BrowserWindow, and as such must be called from the Renderer process. This is because the window.moveTo() method is faster that repeatedly calling the BrowserWindow.setBounds() method. This method can be used as:
+Move() utilises the BrowserWindow.setBounds() method to change the BrowserWindows position. This method can be used as:
 
 ```javascript
 
 const { ElectronTWEEN } = require('electron-tween');
 
 ElectronTWEEN.Move({
-    from: { x: 0, y: 0 },       // must provide an XY object such as this
-    to: { x: 250, y: 250 },     // and same here
+    from: { x: 0, y: 0 },       // if not set uses current BrowserWindow position, otherwise JUMPS to a position
+    to: { x: 250, y: 250 },     // must provide an XY object such as this
     time: 1000,                 // transition time
     easing: 'EXPO_IN',           // type of easing
     start: true,                // automatically start
@@ -205,6 +207,44 @@ new Promise(resolve => {
 });
 
 ```
+
+## IPC Method
+
+Although using Electron's remote module is a quick way to get access to BrowserWindows in the Renderer Process, 
+it is recommended to actually run all of "electron-tween" methods from the Main Process instead. This is because
+the remote module is [considered harmful](https://medium.com/@nornagon/electrons-remote-module-considered-harmful-70d69500f31),
+and has is a [security liability](https://github.com/electron/electron/issues/21408) waiting to occur.
+
+As such the below method is what would be considered conventional when using this library.
+
+**renderer.js**
+```javascript
+// other code...
+const { ipcRenderer } = require('electron');
+
+ipcRenderer.send('tween-window', {
+    // your options should go here
+});
+
+```
+
+**main.js**
+```javascript
+
+// previous code...
+const { ipcMain, BrowserWindow } = require('electron');
+const { ElectronTWEEN } = require('electron-tween');
+
+ipcMain.on('tween-window', (event, opts) => {
+    const windowToTween = BrowserWindow.getFocusedWindow();
+    ElectronTWEEN.Resize({
+        win: windowToTween, // presumably given ElectronTWEEN the appropriate window to be tweened
+        ...opts // destructuring options, otherwise add as desired
+    });
+});
+
+```
+
 
 ## Demo Example
 
