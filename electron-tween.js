@@ -135,7 +135,7 @@ class ElectronTWEEN {
     }
 
     /**
-     * Resizes a BrowserWindow to a given size. Recommended
+     * Resizes a BrowserWindow to a given size.
      * 
      * @param {Object} opts                         Options object.
      * @param {Electron.BrowserWindow} opts.win     BrowserWindow to fade.
@@ -190,7 +190,7 @@ class ElectronTWEEN {
                 // ensure all values are integers and >= 0
                 size.x = Math.max(Math.round(size.x), 0);
                 size.y = Math.max(Math.round(size.y), 0);
-                opts.win.setSize(size.x, size.y);
+                opts.win.setBounds({ width: size.x, height: size.y });
             });
 
         if (opts.start) {
