@@ -1,6 +1,6 @@
 {
   "name": "electron-tween",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A tweening library for ElectronJS BrowserWindows.",
   "main": "electron-tween.js",
   "scripts": {
