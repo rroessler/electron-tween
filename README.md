@@ -258,4 +258,4 @@ npm start # and run electron
 
 ## License
 
-[MIT](https://github.com/electron/electron/blob/master/LICENSE)
+[MIT](https://github.com/rroessler/electron-tween/blob/main/LICENSE)
